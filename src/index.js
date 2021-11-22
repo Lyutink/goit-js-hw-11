@@ -16,12 +16,14 @@ const galleryRef = document.querySelector('.gallery');
 //searchFormRef.addEventListener('submit', debounce(onRequestFromUser, DEBOUNCE_DELAY));
 searchFormRef.addEventListener('submit', onRequestFromUser);
 
+
 function onRequestFromUser(event) {
     event.preventDefault();
-
+    //
     //requestFromUser = event.target.value;
     requestFromUser = inputRef.value;
     console.log(requestFromUser);
+    clearFoo();
     //requestFromUser = requestFromUser.trim();
     console.log("будем вызывать  fetchImages");
     HTTPServise.fetchImages(requestFromUser)
