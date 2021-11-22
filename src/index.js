@@ -1,5 +1,8 @@
 import * as HTTPServise from './fetchImages';
 import './sass/main.scss';
+import Notiflix from 'notiflix';
+import SimpleLightbox from 'simplelightbox';
+import 'simplelightbox/dist/simple-lightbox.min.css';
 //import debounce from 'lodash.debounce';
 
 const DEBOUNCE_DELAY = 300;
@@ -22,20 +25,32 @@ function onRequestFromUser(event) {
     //requestFromUser = requestFromUser.trim();
     console.log("будем вызывать  fetchImages");
     HTTPServise.fetchImages(requestFromUser)
-        .then(response => renderMarkupCard(response.data))
+        .then(response => {
+            console.log("totalHits", response.data.totalHits)
+            if (!response.data.totalHits) {
+                    Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.',
+                    {
+                        timeout: 4000,
+                        });
+                clearFoo();
+                return;
+            }
+            renderMarkupCard(response.data)
+        })
         .catch(error => console.log("AAAAAAAAAA", error));
 }
 
-// async function renderMarkupCard(response) {
-//     console.log(response.hits);
-//     markup = await response.map(result => result.name);
-//     console.log(markup);
-//}
+function clearFoo(){
+    inputRef.value = '';
+    galleryRef.innerHTML = '';
+}
  
 function renderMarkupCard(result) {
     //console.log(result.largeImageURL);
-    const markup = result.hits.map((res) => `<div class="photo-card">
-        <img src="${res.previewURL}" alt="" loading="lazy" />
+   // <a class="gallery-item" href="${res.largeImageURL}"></a>
+    const markup = result.hits.map((res) => `
+    <div class="photo-card">
+        <img class="photo-img" src="${res.webformatURL}" alt="${res.tags}" loading="lazy" />
         <div class="info">
           <p class="info-item">
             <b>Likes: ${res.likes}</b>
@@ -50,7 +65,9 @@ function renderMarkupCard(result) {
             <b>Downloads: ${res.downloads}</b>
           </p>
         </div>
-      </div>`).join('');
+      </div>
+      `).join('');
     galleryRef.innerHTML = markup;
 
 }
+     
