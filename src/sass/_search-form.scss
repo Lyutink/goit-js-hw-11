@@ -1,0 +1,27 @@
+.search-form {
+  display: flex;
+  justify-content: center;
+}
+
+.search-form_input {
+  padding-left: 10px;
+  width: 300px;
+  color: #212529;
+  background-color: #fff;
+  border: 1px solid #bdbdbd;
+  border-top-left-radius: 0.25rem;
+  border-bottom-left-radius: 0.25rem;
+  border-right: none;
+}
+
+.search-form_btn {
+  cursor: pointer;
+  width: 2.5rem;
+  border: 1px solid #bdbdbd;
+
+  color: #212529;
+  padding: 10px;
+  border-top-right-radius: 0.25rem;
+  border-bottom-right-radius: 0.25rem;
+  border-left: none;
+}
