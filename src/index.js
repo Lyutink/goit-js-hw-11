@@ -50,19 +50,25 @@ function renderMarkupCard(result) {
    // <a class="gallery-item" href="${res.largeImageURL}"></a>
     const markup = result.hits.map((res) => `
     <li class="photo-card">
+    <div class = "thumb">
         <img class="photo-img" src="${res.webformatURL}" alt="${res.tags}" loading="lazy" />
+    <div/>    
         <div class="info">
           <p class="info-item">
-            <b>Likes: ${res.likes}</b>
+            <b>Likes</b>
+            ${res.likes}
           </p>
           <p class="info-item">
-            <b>Views: ${res.views}</b>
+            <b>Views</b>
+            ${res.views}
           </p>
           <p class="info-item">
-            <b>Comments: ${res.comments}</b>
+            <b>Comments</b>
+            <span>${res.comments}</span>
           </p>
           <p class="info-item">
-            <b>Downloads: ${res.downloads}</b>
+            <b>Downloads</b>
+            ${res.downloads}
           </p>
         </div>
       </li>
