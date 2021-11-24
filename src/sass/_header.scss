@@ -1,9 +1,17 @@
 .header {
-  //position: fixed;
-  min-width: 1200px;
-
+  position: fixed;
+  left: 0;
+  top: 0;
+  //min-width: 1200px;
+  width: 100%;
   background-color: #5f0ef7;
   height: 80px;
   padding-top: 20px;
   padding-bottom: 20px;
 }
+
+// .header_fixed {
+//   position: fixed;
+//   left: 0;
+//   top: 0;
+// }

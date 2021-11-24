@@ -8,7 +8,9 @@ import 'simplelightbox/dist/simple-lightbox.min.css';
 const DEBOUNCE_DELAY = 300;
 let requestFromUser = '';
 let page = 1;
+let totalResults = 0;
 
+const headerRef = document.querySelector('.header');
 const searchFormRef = document.querySelector('.search-form');
 const inputRef = document.querySelector('.search-form > input');
 const galleryRef = document.querySelector('.gallery-list');
@@ -16,8 +18,12 @@ const btnMoreRef = document.querySelector('.load-more');
 
 
 //searchFormRef.addEventListener('submit', debounce(onRequestFromUser, DEBOUNCE_DELAY));
+headerRef.addEventListener('scrol', scrolHeader);
 searchFormRef.addEventListener('submit', onRequestFromUser);
 
+function scrolHeader() {
+    headerRef.classList('header_fixed');
+}
 
 function onRequestFromUser(event) {
     event.preventDefault();
@@ -25,6 +31,7 @@ function onRequestFromUser(event) {
     requestFromUser = inputRef.value;
     console.log(requestFromUser);
     clearFoo();
+    btnMoreRef.classList.add('is-hidden');
     //requestFromUser = requestFromUser.trim();
     console.log("будем вызывать  fetchImages");
     HTTPServise.fetchImages(requestFromUser, page)
@@ -36,8 +43,13 @@ function onRequestFromUser(event) {
                 clearFoo();
                 return;
             }
+            totalResults = response.data.totalHits - 40;
+            console.log("totalHits", totalResults);
             renderMarkupCard(response.data);
-            marckupBtnMore();
+            if (totalResults > 0) {
+                console.log("more");
+                showBtnMore();
+            }
         })
         .catch(error => console.log("AAAAAAAAAA", error));
 }
@@ -74,16 +86,27 @@ function renderMarkupCard(result) {
     galleryRef.innerHTML = markup;
 }
      
-function marckupBtnMore() {
-    // const btnMore = '<button class = "search-form_btn__more">Show more</button>';
-    // galleryRef.insertAdjacentHTML("afterend", btnMore);
-    // const btnMoreRef = document.querySelector('.search-form_btn__more');
-    // btnMoreRef.addEventListener("click", loadMore);
+function showBtnMore() {
     btnMoreRef.addEventListener('click', loadMore);
-    btnMoreRef.classList.toggle('is-hidden');
-    
+    btnMoreRef.classList.remove('is-hidden');  
 }
 
 function loadMore() {
-     console.log("будем грузить ещё")
+    console.log("будем грузить ещё", page);
+    page += 1;
+    if (totalResults <= 0) {
+        Notiflix.Notify.info(`We're sorry, but you've reached the end of search results.`,
+            { timeout: 4000, });
+        console.log('END');
+        btnMoreRef.classList.add('is-hidden');
+        return;
+    }
+    HTTPServise.fetchImages(requestFromUser, page)
+        .then(response => {
+            console.log("page", page)
+            totalResults -= 40;
+            console.log("totalHits", totalResults);
+            renderMarkupCard(response.data);
+        })
+        .catch(error => console.log("AAAAAAAAAA", error));
  }
