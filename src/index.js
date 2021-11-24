@@ -7,10 +7,12 @@ import 'simplelightbox/dist/simple-lightbox.min.css';
 
 const DEBOUNCE_DELAY = 300;
 let requestFromUser = '';
+let page = 1;
 
 const searchFormRef = document.querySelector('.search-form');
 const inputRef = document.querySelector('.search-form > input');
 const galleryRef = document.querySelector('.gallery-list');
+const btnMoreRef = document.querySelector('.load-more');
 
 
 //searchFormRef.addEventListener('submit', debounce(onRequestFromUser, DEBOUNCE_DELAY));
@@ -19,14 +21,13 @@ searchFormRef.addEventListener('submit', onRequestFromUser);
 
 function onRequestFromUser(event) {
     event.preventDefault();
-    //
-    //requestFromUser = event.target.value;
+
     requestFromUser = inputRef.value;
     console.log(requestFromUser);
     clearFoo();
     //requestFromUser = requestFromUser.trim();
     console.log("будем вызывать  fetchImages");
-    HTTPServise.fetchImages(requestFromUser)
+    HTTPServise.fetchImages(requestFromUser, page)
         .then(response => {
             console.log("totalHits", response.data.totalHits)
             if (!response.data.totalHits) {
@@ -35,7 +36,8 @@ function onRequestFromUser(event) {
                 clearFoo();
                 return;
             }
-            renderMarkupCard(response.data)
+            renderMarkupCard(response.data);
+            marckupBtnMore();
         })
         .catch(error => console.log("AAAAAAAAAA", error));
 }
@@ -46,13 +48,9 @@ function clearFoo(){
 }
  
 function renderMarkupCard(result) {
-    //console.log(result.largeImageURL);
-   // <a class="gallery-item" href="${res.largeImageURL}"></a>
     const markup = result.hits.map((res) => `
     <li class="photo-card">
-    <div class = "thumb">
         <img class="photo-img" src="${res.webformatURL}" alt="${res.tags}" loading="lazy" />
-    <div/>    
         <div class="info">
           <p class="info-item">
             <b>Likes</b>
@@ -74,6 +72,18 @@ function renderMarkupCard(result) {
       </li>
       `).join('');
     galleryRef.innerHTML = markup;
-
 }
      
+function marckupBtnMore() {
+    // const btnMore = '<button class = "search-form_btn__more">Show more</button>';
+    // galleryRef.insertAdjacentHTML("afterend", btnMore);
+    // const btnMoreRef = document.querySelector('.search-form_btn__more');
+    // btnMoreRef.addEventListener("click", loadMore);
+    btnMoreRef.addEventListener('click', loadMore);
+    btnMoreRef.classList.toggle('is-hidden');
+    
+}
+
+function loadMore() {
+     console.log("будем грузить ещё")
+ }
