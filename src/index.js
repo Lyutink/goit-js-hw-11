@@ -17,22 +17,12 @@ let totalResults = 0;
 let stillResults = 0;
 let gallery = new SimpleLightbox('.gallery a');
 
-headerRef.addEventListener('scrol', scrolHeader);
 searchFormRef.addEventListener('submit', onRequestFromUser);
-
-function scrolHeader() {
-    headerRef.classList('header_fixed');
-}
 
 function onRequestFromUser(event) {
     event.preventDefault();
-
-    requestFromUser = inputRef.value;
-    console.log(requestFromUser);
     clearFoo();
-    btnMoreRef.classList.add('is-hidden');
-    //requestFromUser = requestFromUser.trim();
-    console.log("будем вызывать  fetchImages");
+    requestFromUser = inputRef.value;
     page = 1;
     HTTPServise.fetchImages(requestFromUser, page)
         .then(response => {
@@ -45,7 +35,7 @@ function onRequestFromUser(event) {
             totalResults = response.data.totalHits;
             Notiflix.Notify.success(`Hooray! We found ${totalResults} images.`)
             stillResults = totalResults;
-            console.log("totalHits", totalResults);
+            //console.log("totalHits", totalResults);
             renderMarkupCard(response.data);
             gallery.refresh();
             stillResults -= perPage;
@@ -60,6 +50,7 @@ function onRequestFromUser(event) {
 function clearFoo(){
     inputRef.value = '';
     galleryRef.innerHTML = '';
+    btnMoreRef.classList.add('is-hidden');
 }
  
 function renderMarkupCard(result) {
@@ -88,7 +79,7 @@ function renderMarkupCard(result) {
       
       </a>
       `).join('');
-    galleryRef.innerHTML = markup;
+    galleryRef.insertAdjacentHTML("beforeend", markup);
 
 }
      
