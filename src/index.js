@@ -19,32 +19,63 @@ let gallery = new SimpleLightbox('.gallery a');
 
 searchFormRef.addEventListener('submit', onRequestFromUser);
 
-function onRequestFromUser(event) {
+// function onRequestFromUser(event) {
+//     event.preventDefault();
+//     clearFoo();
+//     requestFromUser = inputRef.value;
+//     page = 1;
+//     HTTPServise.fetchImages(requestFromUser, page)
+//         .then(response => {
+//             console.log("totalHits", response.data.totalHits)
+//             if (!response.data.totalHits) {
+//                     Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.',);
+//                 clearFoo();
+//                 return;
+//             }
+//             totalResults = response.data.totalHits;
+//             Notiflix.Notify.success(`Hooray! We found ${totalResults} images.`)
+//             stillResults = totalResults;
+//             //console.log("totalHits", totalResults);
+//             renderMarkupCard(response.data);
+//             gallery.refresh();
+//             stillResults -= perPage;
+//             if (stillResults > perPage) {
+//                 console.log("more");
+//                 showBtnMore();
+//             }
+//         })
+//         .catch(error => console.log("AAAAAAAAAA", error));
+// }
+
+async function onRequestFromUser(event) {
     event.preventDefault();
-    clearFoo();
+    
     requestFromUser = inputRef.value;
+    clearFoo();
     page = 1;
-    HTTPServise.fetchImages(requestFromUser, page)
-        .then(response => {
-            console.log("totalHits", response.data.totalHits)
-            if (!response.data.totalHits) {
-                    Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.',);
-                clearFoo();
-                return;
-            }
-            totalResults = response.data.totalHits;
-            Notiflix.Notify.success(`Hooray! We found ${totalResults} images.`)
-            stillResults = totalResults;
-            //console.log("totalHits", totalResults);
-            renderMarkupCard(response.data);
-            gallery.refresh();
-            stillResults -= perPage;
-            if (stillResults > perPage) {
-                console.log("more");
-                showBtnMore();
-            }
-        })
-        .catch(error => console.log("AAAAAAAAAA", error));
+    try {
+        const response = await HTTPServise.fetchImages(requestFromUser, page);
+        console.log("totalHits", response.data.totalHits)
+        if (!response.data.totalHits) {
+            Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.',);
+            clearFoo();
+            return;
+        }
+        totalResults = response.data.totalHits;
+        Notiflix.Notify.success(`Hooray! We found ${totalResults} images.`)
+        stillResults = totalResults;
+        renderMarkupCard(response.data);
+        gallery.refresh();
+        stillResults -= perPage;
+        if (stillResults > perPage) {
+            console.log("more");
+            showBtnMore();
+        }
+    } catch (error) {
+        Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.',);
+            clearFoo();
+            return;
+    }
 }
 
 function clearFoo(){
