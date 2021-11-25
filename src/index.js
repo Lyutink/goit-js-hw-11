@@ -3,21 +3,20 @@ import './sass/main.scss';
 import Notiflix from 'notiflix';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
-//import debounce from 'lodash.debounce';
-
-const DEBOUNCE_DELAY = 300;
-let requestFromUser = '';
-let page = 1;
-let totalResults = 0;
 
 const headerRef = document.querySelector('.header');
 const searchFormRef = document.querySelector('.search-form');
 const inputRef = document.querySelector('.search-form > input');
-const galleryRef = document.querySelector('.gallery-list');
+const galleryRef = document.querySelector('.gallery');
 const btnMoreRef = document.querySelector('.load-more');
 
+let requestFromUser = '';
+let page = 1;
+let perPage = 40;
+let totalResults = 0;
+let stillResults = 0;
+let gallery = new SimpleLightbox('.gallery a');
 
-//searchFormRef.addEventListener('submit', debounce(onRequestFromUser, DEBOUNCE_DELAY));
 headerRef.addEventListener('scrol', scrolHeader);
 searchFormRef.addEventListener('submit', onRequestFromUser);
 
@@ -34,19 +33,23 @@ function onRequestFromUser(event) {
     btnMoreRef.classList.add('is-hidden');
     //requestFromUser = requestFromUser.trim();
     console.log("будем вызывать  fetchImages");
+    page = 1;
     HTTPServise.fetchImages(requestFromUser, page)
         .then(response => {
             console.log("totalHits", response.data.totalHits)
             if (!response.data.totalHits) {
-                    Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.',
-                    {timeout: 4000,});
+                    Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.',);
                 clearFoo();
                 return;
             }
-            totalResults = response.data.totalHits - 40;
+            totalResults = response.data.totalHits;
+            Notiflix.Notify.success(`Hooray! We found ${totalResults} images.`)
+            stillResults = totalResults;
             console.log("totalHits", totalResults);
             renderMarkupCard(response.data);
-            if (totalResults > 0) {
+            gallery.refresh();
+            stillResults -= perPage;
+            if (stillResults > perPage) {
                 console.log("more");
                 showBtnMore();
             }
@@ -61,7 +64,8 @@ function clearFoo(){
  
 function renderMarkupCard(result) {
     const markup = result.hits.map((res) => `
-    <li class="photo-card">
+    <a href="${res.largeImageURL}">
+    
         <img class="photo-img" src="${res.webformatURL}" alt="${res.tags}" loading="lazy" />
         <div class="info">
           <p class="info-item">
@@ -81,9 +85,11 @@ function renderMarkupCard(result) {
             ${res.downloads}
           </p>
         </div>
-      </li>
+      
+      </a>
       `).join('');
     galleryRef.innerHTML = markup;
+
 }
      
 function showBtnMore() {
@@ -94,19 +100,21 @@ function showBtnMore() {
 function loadMore() {
     console.log("будем грузить ещё", page);
     page += 1;
-    if (totalResults <= 0) {
-        Notiflix.Notify.info(`We're sorry, but you've reached the end of search results.`,
-            { timeout: 4000, });
-        console.log('END');
-        btnMoreRef.classList.add('is-hidden');
-        return;
-    }
     HTTPServise.fetchImages(requestFromUser, page)
         .then(response => {
-            console.log("page", page)
-            totalResults -= 40;
-            console.log("totalHits", totalResults);
+
             renderMarkupCard(response.data);
+            gallery.refresh();
+            stillResults -= perPage;
+            if (stillResults > 0) { Notiflix.Notify.info(`There are ${stillResults} more images.`,); };
+
+            if (stillResults <= 0) {
+                Notiflix.Notify.info(`We're sorry, but you've reached the end of search results.`,);
+                btnMoreRef.classList.add('is-hidden');
+                return;
+            }
+            
         })
         .catch(error => console.log("AAAAAAAAAA", error));
- }
+}
+ 
